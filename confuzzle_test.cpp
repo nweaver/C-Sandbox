@@ -17,5 +17,5 @@ TEST(HelloTest, KnownFailure) {
 }
 
 TEST(TestC, ConfuzzleTest) {
-    EXPECT_EQ(confuzzle((char *)"abc"), 6) << "Just a test";
+    EXPECT_EQ(confuzzle((char *) "abc"), 6) << "Just a test";
 }

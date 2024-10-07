@@ -39,5 +39,7 @@ int confuzzle(char *sid){
     d = d + sbox[c] + 1;
     j += sprintf((confusion + 2 * i), "%2x", d);
   }
+  /* set breakpoint before free to see value w/o memory leak*/
+  free(confusion);
   return j;
 }
