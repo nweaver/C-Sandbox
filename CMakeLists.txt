@@ -22,7 +22,7 @@ add_executable(hello main.c
 enable_testing()
 
 
-add_executable(testbinary confuzzle.c confuzzle_test.cpp) 
+add_executable(testbinary confuzzle.c confuzzle_test.cpp stringexamples.cpp stringexamples_test.cpp) 
 target_link_libraries(
   testbinary
   GTest::gtest_main
