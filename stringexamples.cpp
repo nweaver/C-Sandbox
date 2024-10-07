@@ -4,6 +4,7 @@
 
 #include <ctype.h>
 #include <algorithm>
+#include <ranges>
 
 std::string toupper(std::string s){
     for(auto &c: s){
@@ -17,10 +18,11 @@ std::string reverse(std::string s){
     return s;
 }
 
+
 std::string stripl(std::string s){
     auto index = 0;
     for (auto c : s){
-        if(c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+        if(!isspace(c)) {
             break;
         }
         index++;
@@ -28,10 +30,25 @@ std::string stripl(std::string s){
     return s.substr(index);
 }
 
+/*
+
 std::string stripr(std::string s){
     auto len = s.length();
     for (auto citerator = s.rbegin(); citerator != s.rend(); ++citerator){
-        if(*citerator != ' ' && *citerator != '\t' && *citerator != '\n' && *citerator != '\r') {
+        if(!isspace(*citerator)) {
+            break;
+        }
+        len--;
+    }
+    return s.substr(0, len);
+}
+
+*/
+
+std::string stripr(std::string s){
+    auto len = s.length();
+    for (auto c : s | std::views::reverse ){
+        if(!isspace(c)) {
             break;
         }
         len--;
