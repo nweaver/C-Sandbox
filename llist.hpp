@@ -88,7 +88,6 @@ public:
 
     void append(T data)
     {
-
         if (!_head)
         {
             _head = std::make_shared<LinkedListCell<T>>(data, nullptr);
@@ -105,11 +104,9 @@ public:
         at->_next = std::make_shared<LinkedListCell<T>>(data, nullptr);
     }
 
-    T &operator[](int location)
+    T &operator[](size_t location)
     {
         auto at = _head;
-        if (location < 0)
-            throw LinkedListException("Index out of range");
         while (true)
         {
             if (at == nullptr)

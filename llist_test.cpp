@@ -18,6 +18,7 @@ TEST(LinkedListTest, AppendingOnEnd) {
     }
     for(auto i = 0; i < 10; ++i){
         EXPECT_EQ(bar[i], 9-i);
+        EXPECT_EQ(foo[i], 2 *i);
     }
     auto j = 0;
     for(auto & i : foo){
