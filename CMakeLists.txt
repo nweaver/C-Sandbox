@@ -22,7 +22,8 @@ add_executable(hello main.c
 enable_testing()
 
 
-add_executable(testbinary confuzzle.c confuzzle_test.cpp stringexamples.cpp stringexamples_test.cpp stringexamples_c.c stringexamples_c_test.cpp) 
+add_executable(testbinary confuzzle.c confuzzle_test.cpp stringexamples.cpp stringexamples_test.cpp
+ stringexamples_c.c stringexamples_c_test.cpp llist.cpp llist_test.cpp) 
 target_link_libraries(
   testbinary
   GTest::gtest_main
