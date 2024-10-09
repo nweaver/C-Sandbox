@@ -2,6 +2,9 @@
 #define _LLIST_H
 
 #include <memory>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 // Yes, C++ standard containers already have a similar (and indeed more advanced)
 // version called std::list, but we are doing this as an example of how
@@ -29,7 +32,8 @@ template <class T> class LinkedListIterator : std::input_iterator_tag {
     }
 
     bool operator!=(LinkedListIterator<T> &comp){
-        return _at == nullptr;
+        (void) comp; // Suppresses unused variable compiler warning
+        return _at != nullptr;
     }
 
     T& operator*(){
@@ -74,15 +78,18 @@ public:
     void prepend(T data)
     {
         _head = std::make_shared<LinkedListCell<T>>(data, _head);
+        _len++;
     }
 
     void append(T data)
     {
+
         if (!_head)
         {
             prepend(data);
             return;
         }
+        _len++;
         auto at = _head;
         while (at->_next)
         {
@@ -114,9 +121,24 @@ public:
         return LinkedListIterator<T>(nullptr);
     }
 
+
 private:
     std::shared_ptr<LinkedListCell<T>> _head;
     size_t _len;
 };
+
+template <class T> std::string to_string(LinkedList<T> in){
+    std::stringstream s;
+    s << "[";
+    auto length = in.len();
+    size_t i = 0;
+    for(auto item : in){
+        s << item;
+        i++;
+        if(i < length) s << ", ";
+    }
+    s << "]";
+    return s.str();
+}
 
 #endif
