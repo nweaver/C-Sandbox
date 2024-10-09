@@ -25,24 +25,29 @@ private:
     std::string _msg;
 };
 
-template <class T> class LinkedListIterator : std::input_iterator_tag {
-    public:
-    void operator++(){
+template <class T>
+class LinkedListIterator : std::input_iterator_tag
+{
+public:
+    void operator++()
+    {
         _at = _at->_next;
     }
 
-    bool operator!=(LinkedListIterator<T> &comp){
-        (void) comp; // Suppresses unused variable compiler warning
+    bool operator!=(LinkedListIterator<T> &comp)
+    {
+        (void)comp; // Suppresses unused variable compiler warning
         return _at != nullptr;
     }
 
-    T& operator*(){
+    T &operator*()
+    {
         return _at->_data;
     }
 
-    LinkedListIterator(std::shared_ptr<LinkedListCell<T>> at){ _at = at;}
+    LinkedListIterator(std::shared_ptr<LinkedListCell<T>> at) { _at = at; }
 
-    private:
+private:
     std::shared_ptr<LinkedListCell<T>> _at;
 };
 
@@ -86,15 +91,17 @@ public:
 
         if (!_head)
         {
-            prepend(data);
+            _head = std::make_shared<LinkedListCell<T>>(data, nullptr);
+            _len++;
             return;
         }
-        _len++;
+
         auto at = _head;
         while (at->_next)
         {
             at = at->_next;
         }
+        _len++;
         at->_next = std::make_shared<LinkedListCell<T>>(data, nullptr);
     }
 
@@ -114,28 +121,33 @@ public:
         }
     }
 
-    LinkedListIterator<T> begin(){
+    LinkedListIterator<T> begin()
+    {
         return LinkedListIterator<T>(_head);
     };
-    LinkedListIterator<T> end(){
+    LinkedListIterator<T> end()
+    {
         return LinkedListIterator<T>(nullptr);
     }
-
 
 private:
     std::shared_ptr<LinkedListCell<T>> _head;
     size_t _len;
 };
 
-template <class T> std::string to_string(LinkedList<T> in){
+template <class T>
+std::string to_string(LinkedList<T> in)
+{
     std::stringstream s;
     s << "[";
     auto length = in.len();
     size_t i = 0;
-    for(auto item : in){
+    for (auto item : in)
+    {
         s << item;
         i++;
-        if(i < length) s << ", ";
+        if (i < length)
+            s << ", ";
     }
     s << "]";
     return s.str();
