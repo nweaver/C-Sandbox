@@ -33,4 +33,11 @@ TEST(LinkedListTest, AppendingOnEnd) {
     }
     EXPECT_EQ(to_string(foo), "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]");
 
-}
+    LinkedList<std::string> baz;
+    baz.append("Hola");
+    baz.append("Hello");
+
+    std::cout << to_string(baz) << "\n";
+    std::cout << to_string(foo) << "\n";
+    std::cout << to_string(bar) << "\n";
+    }
