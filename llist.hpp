@@ -81,7 +81,7 @@ public:
     }
 
     // Note well:  It is considered undefined behavior (aka, it breaks len)
-    // if you copy/assign and change the other LinkedList instance.  
+    // if you copy/assign and change the other LinkedList instance.
     // In general it is far better to use std::shared_ptr references
     // to LinkedLists, and this is a case where C++'s call by value
     // default is causing problems.
@@ -171,13 +171,13 @@ std::string to_string(LinkedList<T> &in)
 }
 
 template <class U, class T>
-std::shared_ptr<LinkedList<U>> list_map(LinkedList<T> &in,
-                                        std::function<U(T)> f)
+LinkedList<U> list_map(LinkedList<T> &in,
+                       std::function<U(T)> f)
 {
-    auto ret = std::make_shared<LinkedList<U>>();
+    LinkedList<U> ret;
     for (auto c : in)
     {
-        ret->append(f(c));
+        ret.append(f(c));
     }
     return ret;
 }
@@ -194,14 +194,14 @@ U list_reduce(LinkedList<T> &in,
 }
 
 template <class T>
-std::shared_ptr<LinkedList<T>> list_filter(LinkedList<T> &in,
-                                           std::function<bool(T)> f)
+LinkedList<T> list_filter(LinkedList<T> &in,
+                          std::function<bool(T)> f)
 {
-    auto ret = std::make_shared<LinkedList<T>>();
+    LinkedList<T> ret;
     for (auto c : in)
     {
         if (f(c))
-            ret->append(c);
+            ret.append(c);
     }
     return ret;
 }
