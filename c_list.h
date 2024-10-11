@@ -3,17 +3,19 @@
 
 #include <stdbool.h>
 
-typedef struct linked_list_cell {
-    void * data;
+typedef struct linked_list_cell
+{
+    void *data;
     struct linked_list_cell *next;
 } linked_list_cell;
 
-typedef struct linked_list {
-   struct linked_list_cell *head;
-   size_t length;
+typedef struct linked_list
+{
+    struct linked_list_cell *head;
+    size_t length;
 } linked_list;
 
-linked_list * new_linked_list();
+linked_list *new_linked_list();
 
 void prepend(linked_list *l, void *data);
 void append(linked_list *l, void *data);
