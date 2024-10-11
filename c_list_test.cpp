@@ -22,6 +22,9 @@ TEST(C_LIST, BasicTestsPrepend)
 {
     linked_list *l = new_linked_list();
     std::vector<const char *> teststrings = {"foo", "bar", "baz", "garplay"};
+    char *tmp = (char *) malloc(100);
+    sprintf(tmp, "foo");
+
     size_t i;
     i = 0;
     for (const char *s : teststrings)
@@ -38,7 +41,11 @@ TEST(C_LIST, BasicTestsPrepend)
     }
     EXPECT_EQ(find_at(l, is_foo), 3);
     EXPECT_EQ(find_at(l, is_false), -1);
+    // This does a pointer comparison
+    EXPECT_NE(get_at(l, 3), tmp);
+    EXPECT_TRUE(!strcmp((const char *) get_at(l, 3), tmp));
     free_linked_list(l);
+    free(tmp);
 };
 
 TEST(C_LIST, BasicTestsAppend)
@@ -61,3 +68,17 @@ TEST(C_LIST, BasicTestsAppend)
     }
     free_linked_list(l);
 };
+
+TEST(C_LIST, SandboxPrint)
+{
+    float f = 1.0;
+
+    printf("%i\n", *((int *)&f));
+    printf("%i\n\n", (int)f);
+    f = 0.0;
+    printf("%i\n", *((int *)&f));
+    printf("%i\n\n", (int)f);
+    f = -0.0;
+    printf("%i\n", *((int *)&f));
+    printf("%i\n\n", (int)f);
+}
