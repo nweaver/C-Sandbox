@@ -16,6 +16,11 @@ extern "C"
         (void)data;
         return false;
     }
+
+    int sorter(const void *a, const void *b){
+        return strcmp(*((const char **) a), *((const char **) b));
+    }
+
 }
 
 TEST(C_LIST, BasicTestsPrepend)
@@ -81,4 +86,16 @@ TEST(C_LIST, SandboxPrint)
     f = -0.0;
     printf("%i\n", *((int *)&f));
     printf("%i\n\n", (int)f);
+}
+
+
+TEST(C_LIST, qsort_test)
+{
+    const char *test[] = {"foo", "bar", "baz", "garplay"};
+    const char *sorted[] = {"bar", "baz", "foo", "garplay"};
+    int i;
+    qsort(test, 4, sizeof(char *), sorter);
+    for (i = 0; i < 4; ++i){
+        EXPECT_STREQ(test[i], sorted[i]);
+    }
 }
