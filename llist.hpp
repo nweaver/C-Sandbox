@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <functional>
 
 // Yes, C++ standard containers already have a similar (and indeed more advanced)
 // version called std::list, but we are doing this as an example of how
@@ -57,6 +58,7 @@ class LinkedListCell
 public:
     friend class LinkedList<T>;
     friend class LinkedListIterator<T>;
+
     LinkedListCell(T data, std::shared_ptr<LinkedListCell<T>> next)
     {
         _next = next;
@@ -76,6 +78,19 @@ public:
     {
         _head = nullptr;
         _len = 0;
+    }
+
+    LinkedList &operator=(const LinkedList &other)
+    {
+        _head = other._head;
+        _len = other._len;
+        return *this;
+    }
+
+    LinkedList(LinkedList &other)
+    {
+        _head = other._head;
+        _len = other._len;
     }
 
     size_t len() { return _len; }
@@ -133,7 +148,7 @@ private:
 };
 
 template <class T>
-std::string to_string(LinkedList<T> in)
+std::string to_string(LinkedList<T> &in)
 {
     std::stringstream s;
     s << "[";
@@ -148,6 +163,44 @@ std::string to_string(LinkedList<T> in)
     }
     s << "]";
     return s.str();
+}
+
+template <class U, class T>
+LinkedList<U> list_map(LinkedList<T> &in,
+                       std::function<U(T)> f)
+{
+    LinkedList<U> ret;
+    for (auto c : in)
+    {
+        ret.append(f(c));
+    }
+    return ret;
+}
+
+template <class U, class T>
+U list_reduce(LinkedList<T> &in,
+              std::function<U(U, T)> f, U initval)
+{
+    for (auto c : in)
+    {
+        initval = f(initval, c);
+    }
+    return initval;
+}
+
+
+
+template <class T>
+LinkedList<T> list_filter(LinkedList<T> &in,
+                          std::function<bool(T)> f)
+{
+    LinkedList<T> ret;
+    for (auto c : in)
+    {
+        if (f(c))
+            ret.append(c);
+    }
+    return ret;
 }
 
 #endif
