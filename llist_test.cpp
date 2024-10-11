@@ -67,33 +67,33 @@ TEST(LinkedListTest, FunctionalTesting)
     }
 
     auto filtered = list_filter<int>(foo, iseven);
-    EXPECT_EQ(to_string(filtered), "[0, 2, 4, 6, 8]");
+    EXPECT_EQ(to_string(*filtered), "[0, 2, 4, 6, 8]");
 
     // Trailing type on the lambda isn't strictly necessary,
     filtered = list_filter<int>(foo, [](auto i) -> bool
                                     { return i % 2; });
-    EXPECT_EQ(to_string(filtered), "[1, 3, 5, 7, 9]");
+    EXPECT_EQ(to_string(*filtered), "[1, 3, 5, 7, 9]");
 
     filtered = list_filter<int>(foo, [](auto i)
                                     { return i % 2; });
-    EXPECT_EQ(to_string(filtered), "[1, 3, 5, 7, 9]");
+    EXPECT_EQ(to_string(*filtered), "[1, 3, 5, 7, 9]");
 
     auto baz = list_map<std::string, int>(foo,
                                           stringify);
-    EXPECT_EQ(to_string(baz), "[\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]");
+    EXPECT_EQ(to_string(*baz), "[\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]");
 
 
 
     auto bar = list_map<int, int>(foo,
                                   [](auto x)
                                   { return x + 1; });
-    EXPECT_EQ(to_string(bar), "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]");
+    EXPECT_EQ(to_string(*bar), "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]");
 
     const auto incr = 10;
     bar = list_map<int, int>(foo,
                                   [](auto x)
                                   { return x + incr; });
-    EXPECT_EQ(to_string(bar), "[10, 11, 12, 13, 14, 15, 16, 17, 18, 19]");
+    EXPECT_EQ(to_string(*bar), "[10, 11, 12, 13, 14, 15, 16, 17, 18, 19]");
 
     auto garplay = list_reduce<int, int>(foo, [](auto x, auto y)
                                          { return x + y; }, 0);

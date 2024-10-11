@@ -166,13 +166,13 @@ std::string to_string(LinkedList<T> &in)
 }
 
 template <class U, class T>
-LinkedList<U> list_map(LinkedList<T> &in,
-                       std::function<U(T)> f)
+std::shared_ptr<LinkedList<U>> list_map(LinkedList<T> &in,
+                                        std::function<U(T)> f)
 {
-    LinkedList<U> ret;
+    auto ret = std::make_shared<LinkedList<U>>();
     for (auto c : in)
     {
-        ret.append(f(c));
+        ret->append(f(c));
     }
     return ret;
 }
@@ -188,17 +188,15 @@ U list_reduce(LinkedList<T> &in,
     return initval;
 }
 
-
-
 template <class T>
-LinkedList<T> list_filter(LinkedList<T> &in,
-                          std::function<bool(T)> f)
+std::shared_ptr<LinkedList<T>> list_filter(LinkedList<T> &in,
+                                           std::function<bool(T)> f)
 {
-    LinkedList<T> ret;
+    auto ret = std::make_shared<LinkedList<T>>();
     for (auto c : in)
     {
         if (f(c))
-            ret.append(c);
+            ret->append(c);
     }
     return ret;
 }
