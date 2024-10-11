@@ -80,6 +80,11 @@ public:
         _len = 0;
     }
 
+    // Note well:  It is considered undefined behavior (aka, it breaks len)
+    // if you copy/assign and change the other LinkedList instance.  
+    // In general it is far better to use std::shared_ptr references
+    // to LinkedLists, and this is a case where C++'s call by value
+    // default is causing problems.
     LinkedList &operator=(const LinkedList &other)
     {
         _head = other._head;
