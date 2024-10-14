@@ -33,12 +33,12 @@ TEST(GraphTest, Comprehensive)
         i = 0;
 
         for(auto step : DijkstraTraversal<int>(g, 0)) {
-            assert(step->current->name == i);
-            assert(step->distance == float(i));
+            EXPECT_TRUE(step->current->name == i);
+            EXPECT_TRUE(step->distance == float(i));
             if(i != 0) {
-                assert(step->previous->name == (i-1));
+                EXPECT_TRUE(step->previous->name == (i-1));
             } else {
-                assert(step->previous == nullptr);
+                EXPECT_TRUE(step->previous == nullptr);
             }
             i++;
         }
@@ -51,8 +51,8 @@ TEST(GraphTest, Comprehensive)
         }
         i = 0;
         for(auto step : DijkstraTraversal<int>(g, 0)) {
-            assert(step->current->name == i);
-            assert(step->distance == float(i));
+            EXPECT_TRUE(step->current->name == i);
+            EXPECT_TRUE(step->distance == float(i));
             i++;
         }
     }
