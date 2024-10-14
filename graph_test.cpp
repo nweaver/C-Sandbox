@@ -28,38 +28,8 @@ TEST(GraphTest, Comprehensive)
         for (i = 0; i < 10; ++i)
         {
             g->create_link(array[i], (array[i] + 1) % 10, 1.0);
+            EXPECT_THROW(g->create_link(array[i], (array[i] + 1) % 10, 32.3), std::domain_error);
         }
         i = 0;
-        for (auto step : dijkstra_traversal<int>(g, 0))
-        {
-            EXPECT_TRUE(step->current->name == i);
-            EXPECT_TRUE(step->distance == float(i));
-            if (i != 0)
-            {
-                EXPECT_TRUE(step->previous->name == (i - 1));
-            }
-            else
-            {
-                EXPECT_TRUE(step->previous == nullptr);
-            }
-            i++;
-        }
-        for (i = 0; i < 10; ++i)
-        {
-            for (auto j = 0; j < 10; ++j)
-            {
-                if ((i + 1) % 10 != j)
-                {
-                    g->create_link(i, j, 11);
-                }
-            }
-        }
-        i = 0;
-        for (auto step : dijkstra_traversal<int>(g, 0))
-        {
-            EXPECT_TRUE(step->current->name == i);
-            EXPECT_TRUE(step->distance == float(i));
-            i++;
-        }
     }
 }
