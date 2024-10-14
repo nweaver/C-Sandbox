@@ -31,5 +31,29 @@ TEST(GraphTest, Comprehensive)
             EXPECT_THROW(g->create_link(array[i], (array[i] + 1) % 10, 32.3), std::domain_error);
         }
         i = 0;
+
+        for(auto step : DijkstraTraversal<int>(g, 0)) {
+            assert(step->current->name == i);
+            assert(step->distance == float(i));
+            if(i != 0) {
+                assert(step->previous->name == (i-1));
+            } else {
+                assert(step->previous == nullptr);
+            }
+            i++;
+        }
+        for(i = 0; i < 10; ++i) {
+            for(auto j = 0; j < 10; ++j) {
+                if((i + 1) % 10 != j) {
+                    g->create_link(i,j,11);
+                }
+            }
+        }
+        i = 0;
+        for(auto step : DijkstraTraversal<int>(g, 0)) {
+            assert(step->current->name == i);
+            assert(step->distance == float(i));
+            i++;
+        }
     }
 }

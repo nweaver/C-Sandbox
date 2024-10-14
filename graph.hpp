@@ -66,6 +66,7 @@ private:
     std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes{};
     friend GraphEdge<T>;
     friend GraphNode<T>;
+    friend DijkstraTraversalIterator<T>;
 
     // Done so the constructor can't be called except
     // by the make_shared factory function create()
@@ -157,6 +158,7 @@ private:
     std::unordered_set<std::shared_ptr<GraphEdge<T>>> in_edges{};
     friend Graph<T>;
     friend GraphEdge<T>;
+    friend DijkstraTraversalIterator<T>;
 
 public:
     const T name;
@@ -230,7 +232,7 @@ private:
                 throw std::logic_error("Unable to find the node");
             }
             for(auto itr : working_graph->nodes) {
-                auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second());
+                auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
                 if (itr.first == start) {
                     element->distance = 0;
                 }
@@ -273,7 +275,7 @@ private:
             // start and end are weak pointers so lets make the 
             // shared version
             auto start = itr->start.lock();
-            auto end = iter->end.lock();
+            auto end = itr->end.lock();
             if(working_set.contains(end)) {
                 auto distance = current_node->distance + itr->weight;
                 if(distance < working_set[end]->distance) {
