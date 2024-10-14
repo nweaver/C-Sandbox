@@ -258,6 +258,8 @@ private:
         if (working_set.size() == 0) {
             return;
         }
+        // The iterator for a map automatically has first as the key
+        // second as the value, which in this case is a DijkstraTraversal
         for (auto itr: working_set) {
             if(current_node == nullptr) {
                 current_node = itr.second;
@@ -273,7 +275,7 @@ private:
         }
         for (auto itr : current_node->current->out_edges) {
             // start and end are weak pointers so lets make the 
-            // shared version
+            // shared version for the actual work here.
             auto start = itr->start.lock();
             auto end = itr->end.lock();
             if(working_set.contains(end)) {
