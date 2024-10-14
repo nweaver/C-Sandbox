@@ -18,7 +18,7 @@ TEST(GraphTest, Comprehensive)
     auto rng = std::default_random_engine{};
     for (auto k = 0; k < 10; ++k)
     {
-        auto g = std::make_shared<graph<int>>();
+        auto g = Graph<int>::create();
         std::shuffle(std::begin(array), std::end(array), rng);
         for (i = 0; i < 10; ++i)
         {
