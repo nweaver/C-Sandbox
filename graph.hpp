@@ -19,7 +19,6 @@
 // substitution: replacing the typename T with whatever type is actually
 // used in the code.
 
-
 template <class T>
 class GraphNode;
 template <class T>
@@ -27,13 +26,18 @@ class GraphEdge;
 template <class T>
 class Graph;
 
-template <class T> struct DijkstraIterationStep;
-template <class T> class DijkstraTraversal;
-template <class T> struct DijkstraTraversalIterator;
+template <class T>
+struct DijkstraIterationStep;
+template <class T>
+class DijkstraTraversal;
+template <class T>
+struct DijkstraTraversalIterator;
 
 // The primary class for a Graph.
-//
-// This implementation uses an adjacency list within each node, and the Graph
+
+// This implementation uses an adjacency list within each node (so each node has
+// a set of all edges to or from that node, with each edge knowing which
+// nodes it starts and ends with), and the Graph
 // itself has a name->node mapping.
 
 // We have to be careful here in distinguishing between std::shared_ptr and
@@ -45,7 +49,7 @@ template <class T> struct DijkstraTraversalIterator;
 // at this node, which again is fine as when a node is deleted it will
 // delete its edges.
 
-// The problem comes with the link from the edges back to the nodes.  
+// The problem comes with the link from the edges back to the nodes.
 // If we used std::shared_ptr here, this would mean a node could never
 // be deleted because an edge would refer to it, and the edge wouldn't be deleted
 // because a node was referring to it, creating a cyclic structure.
@@ -55,7 +59,7 @@ template <class T> struct DijkstraTraversalIterator;
 // as a reference for cleanup purposes, so an edge won't keep a node around needlessly.
 // But a weak pointer can't also be accessed directly, instead one needs to
 // convert it to a shared_pointer by either calling lock() (which returns a shared
-// pointer or nullptr if the underlying object has been freed), or by calling 
+// pointer or nullptr if the underlying object has been freed), or by calling
 // std::shared_ptr's constructor on a weak-pointer (which will throw a std::bad_weak_ptr
 // exception if the data was already freed)
 
@@ -63,26 +67,47 @@ template <class T>
 class Graph : std::enable_shared_from_this<Graph<T>>
 {
 private:
+    // We store the name->node mapping as an unordered map.
+    // The unordered map class doesn't guarentee any order
+    // when iterating over the contents but it is fast: O(1)
+    // expected to insert new data.
+
     std::unordered_map<T, std::shared_ptr<GraphNode<T>>> nodes{};
+
+    // A set of friend declarations.
     friend GraphEdge<T>;
     friend GraphNode<T>;
     friend DijkstraTraversalIterator<T>;
 
     // Done so the constructor can't be called except
-    // by the make_shared factory function create()
-    struct Private{ explicit Private() = default; };
-
+    // by the make_shared factory function create().
+    // As a result we will never have to worry about
+    // Graph objects that aren't automatically managed
+    // by std::shared_ptr reference counting.
+    struct Private
+    {
+        explicit Private() = default;
+    };
 
 public:
-    
-    Graph(Private){
-
+    // The constructor doesn't do anything since the
+    // default constructor for the map creates everything
+    // just fine.
+    Graph(Private)
+    {
     }
 
-    static std::shared_ptr<Graph<T>> create(){
+    // This is an example of a static "Factory" function
+    // that creates instances of Graph objects as shared
+    // pointers.
+    static std::shared_ptr<Graph<T>> create()
+    {
         return std::make_shared<Graph<T>>(Private());
     }
 
+    // Create a new node in the graph named "name".
+    // This does a fair bit of checking, making sure
+    // that the name wasn't already used to create a node.
     void create_node(T name)
     {
         if (nodes.contains(name))
@@ -92,17 +117,25 @@ public:
         nodes[name] = std::make_shared<GraphNode<T>>(name);
     }
 
+    // Creates a link between to nodes.  There can only exist
+    // one link from a given start to a given end, and each link has a
+    // weight that is used in the traversal.
     void create_link(T start, T end, double weight)
     {
+        // Make sure that the nodes actually exist.
         if (!nodes.contains(start) || !nodes.contains(end))
         {
             throw std::domain_error("Node does not exist");
         }
+
+        // The edge constructor uses std::weak_ptr, which the
+        // shared_ptrs are automatically converted to.
         auto edge = std::make_shared<GraphEdge<T>>(nodes[start], nodes[end],
-                                                    weight);
-        for (auto edge : nodes[start]->out_edges){
+                                                   weight);
+        for (auto edge : nodes[start]->out_edges)
+        {
             // Our edge->end node is a weak_ptr, so we need
-            // to convert it to a shared pointer 
+            // to convert it back to a shared pointer
             // before we access its fields.  Note that
             // we aren't bothering to check that the
             // conversion worked.  It would only fail if
@@ -110,10 +143,11 @@ public:
             // crashing immediately afterwards with a null pointer
             // exception is Just Fine.
             auto end_node = edge->end.lock();
-            if (end_node->name == end){
+            if (end_node->name == end)
+            {
                 throw std::domain_error("Edge already exists");
             }
-        }                                                    
+        }
         nodes[start]->out_edges.insert(edge);
         nodes[end]->in_edges.insert(edge);
     }
@@ -135,10 +169,10 @@ public:
     const std::weak_ptr<GraphNode<T>> end;
 
     GraphEdge(std::weak_ptr<GraphNode<T>> startIn,
-               std::weak_ptr<GraphNode<T>> endIn,
-               double weightIn) : weight(weightIn), start(startIn), end(endIn)
+              std::weak_ptr<GraphNode<T>> endIn,
+              double weightIn) : weight(weightIn), start(startIn), end(endIn)
     {
-
+        // This algorithm needs positive weights to work...
         if (weight <= 0)
         {
             throw std::domain_error("Weights must be positive");
@@ -168,7 +202,6 @@ public:
     }
 };
 
-
 /*
  * This class is used to return step in the iteration:
  * it contains a pointer to the node, the distance to this node from
@@ -176,13 +209,15 @@ public:
  * node).
  */
 template <class T>
-struct DijkstraIterationStep {
+struct DijkstraIterationStep
+{
 public:
     std::shared_ptr<GraphNode<T>> current;
     double distance = HUGE_VAL;
     std::shared_ptr<GraphNode<T>> previous = nullptr;
 
-    explicit DijkstraIterationStep(std::shared_ptr<GraphNode<T>> node) : current(node) {
+    explicit DijkstraIterationStep(std::shared_ptr<GraphNode<T>> node) : current(node)
+    {
     }
 };
 
@@ -210,34 +245,51 @@ public:
 // and ++ will be called just before the ending is checked.
 
 template <class T>
-struct DijkstraTraversalIterator: std::input_iterator_tag {
+struct DijkstraTraversalIterator : std::input_iterator_tag
+{
     friend DijkstraTraversal<T>;
+
 private:
+    // The working set maps GraphNodes (as shared ptrs) to the
+    // associated iteration information (which contains the node, the distance,
+    // and the prior node.)
     std::unordered_map<std::shared_ptr<GraphNode<T>>,
-                    std::shared_ptr<DijkstraIterationStep<T>>> working_set;
+                       std::shared_ptr<DijkstraIterationStep<T>>>
+        working_set;
     std::shared_ptr<DijkstraIterationStep<T>> current_node = nullptr;
     const std::shared_ptr<Graph<T>> working_graph;
 
     // The private constructor for the iterator.  If its the end it does nothing.
     // If it is the beginning it creates the working set and initializes all the
     // distances to +infinity, except for the start which it initializes to zero.
-    //
+
     // Once done it calls the intnernal iteration function once so that current_node
     // will be pointing to the first node in the traversal (which is the start node).
     // and the first iteration of the calculation will be executed.
-    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graph_ptr, T start, bool is_beginning) :
-    working_graph(graph_ptr) {
-        if(is_beginning) {
-            if(!working_graph->nodes.contains(start)) {
+    DijkstraTraversalIterator(std::shared_ptr<Graph<T>> graph_ptr, T start, bool is_beginning) : working_graph(graph_ptr)
+    {
+        // Only do the work for the beginning iterator.  The end iterator
+        // is effectively a dummy.
+        if (is_beginning)
+        {
+            if (!working_graph->nodes.contains(start))
+            {
                 throw std::logic_error("Unable to find the node");
             }
-            for(auto itr : working_graph->nodes) {
+            // Iterator for maps return an object where the .first field is the key and
+            // the .second field is the value.  So for this it is the name and the
+            // GraphNode object itself.
+            for (auto itr : working_graph->nodes)
+            {
                 auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
-                if (itr.first == start) {
+                if (itr.first == start)
+                {
                     element->distance = 0;
                 }
                 working_set[itr.second] = element;
             }
+            // Does a single step of the iterator so we are all queued up
+            // at the first element.
             this->iter();
         }
     }
@@ -253,34 +305,44 @@ private:
     // up the destination.  If that destination is in the working set, it checks the
     // distance.  If the new distance would be less it reduces the distance and updates
     // the previous node on the record.
-    void iter() {
+    void iter()
+    {
         current_node = nullptr;
-        if (working_set.size() == 0) {
+        if (working_set.size() == 0)
+        {
             return;
         }
         // The iterator for a map automatically has first as the key
+        // which is the node itself and
         // second as the value, which in this case is a DijkstraTraversal
-        for (auto itr: working_set) {
-            if(current_node == nullptr) {
+        for (auto itr : working_set)
+        {
+            if (current_node == nullptr)
+            {
                 current_node = itr.second;
             }
-            if(itr.second->distance < current_node->distance) {
+            if (itr.second->distance < current_node->distance)
+            {
                 current_node = itr.second;
             }
         }
         working_set.erase(current_node->current);
-        if(current_node->distance == HUGE_VAL) {
+        if (current_node->distance == HUGE_VAL)
+        {
             current_node = nullptr;
             return;
         }
-        for (auto itr : current_node->current->out_edges) {
-            // start and end are weak pointers so lets make the 
+        for (auto itr : current_node->current->out_edges)
+        {
+            // start and end are weak pointers so lets make the
             // shared version for the actual work here.
             auto start = itr->start.lock();
             auto end = itr->end.lock();
-            if(working_set.contains(end)) {
+            if (working_set.contains(end))
+            {
                 auto distance = current_node->distance + itr->weight;
-                if(distance < working_set[end]->distance) {
+                if (distance < working_set[end]->distance)
+                {
                     working_set[end]->distance = distance;
                     working_set[end]->previous = current_node->current;
                 }
@@ -291,21 +353,24 @@ private:
 public:
     // The ++ operator is the part that calls the iterator to
     // make sure the current node is available.
-    void operator++() {
+    void operator++()
+    {
         iter();
     }
 
     // And the * operator returns the current node.
-    std::shared_ptr<DijkstraIterationStep<T>> operator*() {
+    std::shared_ptr<DijkstraIterationStep<T>> operator*()
+    {
         return current_node;
     }
 
     // And this is "is there still data left".  The contract for the
-    // iterator says that ++ is called AFTER the data is accessed, so
-    // we know it will be executed in the loop in order: If there is
+    // iterator says that ++ is called AFTER the data is accessed and before
+    // this is called, so we know it will be executed in the loop in order: If there is
     // no data left the != operation will be checked before the next call
     // to *.
-    bool operator!=(DijkstraTraversalIterator &) {
+    bool operator!=(DijkstraTraversalIterator &)
+    {
         return current_node != nullptr;
     }
 };
@@ -323,30 +388,35 @@ public:
 // and the start and end were just pointers to the first element and one plus
 // the last element, and the ++ was just doing pointer arithmatic.
 template <class T>
-class DijkstraTraversal {
+class DijkstraTraversal
+{
 
 public:
     const std::shared_ptr<Graph<T>> working_graph;
     const T start;
-    DijkstraTraversal(std::shared_ptr<Graph<T>> g, T s) : working_graph(g), start(s){
+    DijkstraTraversal(std::shared_ptr<Graph<T>> g, T s) : working_graph(g), start(s)
+    {
     }
 
-    DijkstraTraversalIterator<T> begin() {
+    DijkstraTraversalIterator<T> begin()
+    {
         return DijkstraTraversalIterator<T>(working_graph, start, true);
     }
 
-    DijkstraTraversalIterator<T> begin() const {
+    DijkstraTraversalIterator<T> begin() const
+    {
         return DijkstraTraversalIterator<T>(working_graph, start, true);
     }
 
-    DijkstraTraversalIterator<T> end() {
+    DijkstraTraversalIterator<T> end()
+    {
         return DijkstraTraversalIterator<T>(working_graph, start, false);
     }
 
-    DijkstraTraversalIterator<T> end() const {
+    DijkstraTraversalIterator<T> end() const
+    {
         return DijkstraTraversalIterator<T>(working_graph, start, false);
     }
 };
-
 
 #endif
