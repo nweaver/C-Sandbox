@@ -55,7 +55,10 @@ TEST(FileTest, OperatorInTest)
 
 TEST(FileTest, OperatorInBetter)
 {
-    std::ifstream input{"../testfile.txt"};
+    // Here is an example of doing an fstream, where we specify it is binary
+    // (which doesn't affect getline from working) and that we are reading the file
+    // showing how we can OR two flags together
+    std::fstream input{"../testfile.txt", std::istream::binary | std::istream::in};
     if (!input.is_open())
     {
         ASSERT_TRUE(false);
