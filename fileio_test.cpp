@@ -71,6 +71,19 @@ TEST(FileTest, OperatorInBetter)
         int i;
         ibuf >> i;
         if (ibuf)
+        {
             std::cout << "<< Got integer \"" << i << "\"\n";
+            std::cout.setf(std::ios_base::hex, std::ios_base::basefield);
+            std::cout.setf(std::ios_base::showbase);
+            std::cout << "<< As hex it is \"" << i << "\"\n";
+
+            std::cout.unsetf(std::ios_base::hex);
+            std::cout.unsetf(std::ios_base::showbase);
+            std::cout << "<< and back at default \"" << i << "\"\n";
+
+            // Can also shortcut
+            std::cout << std::hex << "<< As hex it is \"" << i << "\"\n";
+            std::cout << std::dec << "<< and back at default \"" << i << "\"\n";
+        }
     }
 }
