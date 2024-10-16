@@ -6,11 +6,8 @@
 // Demonstrate opening a file for reading
 TEST(FileTest, BasicLoadingGetline)
 {
-    // This should be equal by the std::string equality, which is
-    // what we REALLY want.
-    //
     // This is being run in build but the actual file is outside, so
-    // we do ../
+    // we do ../ on loading
     std::ifstream input{"../testfile.txt"};
     if (!input.is_open())
     {
@@ -27,11 +24,6 @@ TEST(FileTest, BasicLoadingGetline)
 
 TEST(FileTest, BasicLoadingGetlineSmartpointer)
 {
-    // This should be equal by the std::string equality, which is
-    // what we REALLY want.
-    //
-    // This is being run in build but the actual file is outside, so
-    // we do ../
     auto input = std::make_shared<std::ifstream>("../testfile.txt");
     if (!input->is_open())
     {
@@ -45,7 +37,6 @@ TEST(FileTest, BasicLoadingGetlineSmartpointer)
         std::cout << "getline Got string \"" << s << "\"\n";
     }
 }
-
 
 TEST(FileTest, OperatorInTest)
 {
@@ -76,6 +67,7 @@ TEST(FileTest, OperatorInBetter)
         std::istringstream ibuf(s);
         int i;
         ibuf >> i;
-        std::cout << "<< Got integer \"" << i << "\"\n";
+        if (ibuf)
+            std::cout << "<< Got integer \"" << i << "\"\n";
     }
 }
