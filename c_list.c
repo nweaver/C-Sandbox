@@ -5,7 +5,8 @@
 
 linked_list *new_linked_list()
 {
-    linked_list *ret = (linked_list *)malloc(sizeof(linked_list));
+    linked_list *ret = (linked_list *)malloc(
+        sizeof(linked_list));
     ret->length = 0;
     ret->head = NULL;
     return ret;
