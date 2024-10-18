@@ -30,7 +30,7 @@ static const uint8_t sbox[256] = {
  */
 int confuzzle(char *sid){
   char *confusion = malloc(sizeof(char) * 2 * (strlen(sid) + 1));
-  int i;
+  size_t i;
   int j = 0;
   uint8_t c;
   uint8_t d = 0;
