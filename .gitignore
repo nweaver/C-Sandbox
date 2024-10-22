@@ -63,3 +63,6 @@ CmakeCache.txt
 cmake_install.cmake
 C__
 build
+
+# Python
+__pycache__
