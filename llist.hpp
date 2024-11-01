@@ -22,7 +22,7 @@ public:
     LinkedListException(std::string in) { _msg = in; }
     virtual const char *what() { return _msg.c_str(); }
 
-private:
+protected:
     std::string _msg;
 };
 
@@ -48,7 +48,7 @@ public:
 
     LinkedListIterator(std::shared_ptr<LinkedListCell<T>> at) { _at = at; }
 
-private:
+protected:
     std::shared_ptr<LinkedListCell<T>> _at;
 };
 
@@ -74,7 +74,7 @@ public:
 
     ConstLinkedListIterator(std::shared_ptr<LinkedListCell<T>> at) { _at = at; }
 
-private:
+protected:
     std::shared_ptr<LinkedListCell<T>> _at;
 };
 
@@ -92,7 +92,7 @@ public:
         _data = data;
     }
 
-private:
+protected:
     T _data;
     std::shared_ptr<LinkedListCell<T>> _next;
 };
@@ -135,21 +135,21 @@ public:
         _head = nullptr;
         _tail = nullptr;
         _len = 0;
-        for (const auto & data : other)
+        for (const auto &data : other)
         {
             append(data);
         }
     }
 
-    size_t len() { return _len; }
+    virtual size_t len() { return _len; }
 
-    void prepend(const T &data)
+    virtual void prepend(const T &data)
     {
         _head = std::make_shared<LinkedListCell<T>>(data, _head);
         _len++;
     }
 
-    void append(const T &data)
+    virtual void append(const T &data)
     {
         if (!_head)
         {
@@ -164,7 +164,7 @@ public:
         _len++;
     }
 
-    T &operator[](size_t location)
+    virtual T &operator[](size_t location)
     {
         auto at = _head;
         while (true)
@@ -196,7 +196,7 @@ public:
         return ConstLinkedListIterator<T>(nullptr);
     }
 
-private:
+protected:
     std::shared_ptr<LinkedListCell<T>> _head;
     std::shared_ptr<LinkedListCell<T>> _tail;
     size_t _len;
