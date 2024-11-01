@@ -4,4 +4,5 @@
 int confuzzle(char *input);
 
 
+
 #endif

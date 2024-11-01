@@ -53,13 +53,40 @@ private:
 };
 
 template <class T>
+class ConstLinkedListIterator : std::input_iterator_tag
+{
+public:
+    void operator++()
+    {
+        _at = _at->_next;
+    }
+
+    bool operator!=(const ConstLinkedListIterator<T> &comp)
+    {
+        (void)comp; // Suppresses unused variable compiler warning
+        return _at != nullptr;
+    }
+
+    const T &operator*()
+    {
+        return _at->_data;
+    }
+
+    ConstLinkedListIterator(std::shared_ptr<LinkedListCell<T>> at) { _at = at; }
+
+private:
+    std::shared_ptr<LinkedListCell<T>> _at;
+};
+
+template <class T>
 class LinkedListCell
 {
 public:
     friend class LinkedList<T>;
     friend class LinkedListIterator<T>;
+    friend class ConstLinkedListIterator<T>;
 
-    LinkedListCell(T data, std::shared_ptr<LinkedListCell<T>> next)
+    LinkedListCell(const T &data, std::shared_ptr<LinkedListCell<T>> next)
     {
         _next = next;
         _data = data;
@@ -77,51 +104,64 @@ public:
     LinkedList()
     {
         _head = nullptr;
+        _tail = nullptr;
         _len = 0;
     }
 
-    // Note well:  It is considered undefined behavior (aka, it breaks len)
-    // if you copy/assign and change the other LinkedList instance.
-    // In general it is far better to use std::shared_ptr references
-    // to LinkedLists, and this is a case where C++'s call by value
-    // default is causing problems.
+    // In an attempt to bring things into line with
+    // standard C++ libraries, assignment is a deep copy
+    // (like string or vectors are).
     LinkedList &operator=(const LinkedList &other)
     {
-        _head = other._head;
-        _len = other._len;
+        // For self assignment we do nothing...
+        if (&other == this)
+        {
+            return *this;
+        }
+
+        // Otherwise, we erase our old data...
+        _head = nullptr;
+        _tail = nullptr;
+        _len = 0;
+        for (const auto &data : other)
+        {
+            append(data);
+        }
         return *this;
     }
 
-    LinkedList(LinkedList &other)
+    LinkedList(const LinkedList &other)
     {
-        _head = other._head;
-        _len = other._len;
+        _head = nullptr;
+        _tail = nullptr;
+        _len = 0;
+        for (const auto & data : other)
+        {
+            append(data);
+        }
     }
 
     size_t len() { return _len; }
 
-    void prepend(T data)
+    void prepend(const T &data)
     {
         _head = std::make_shared<LinkedListCell<T>>(data, _head);
         _len++;
     }
 
-    void append(T data)
+    void append(const T &data)
     {
         if (!_head)
         {
             _head = std::make_shared<LinkedListCell<T>>(data, nullptr);
+            _tail = _head;
             _len++;
             return;
         }
 
-        auto at = _head;
-        while (at->_next)
-        {
-            at = at->_next;
-        }
+        _tail->_next = std::make_shared<LinkedListCell<T>>(data, nullptr);
+        _tail = _tail->_next;
         _len++;
-        at->_next = std::make_shared<LinkedListCell<T>>(data, nullptr);
     }
 
     T &operator[](size_t location)
@@ -138,17 +178,27 @@ public:
         }
     }
 
-    LinkedListIterator<T> begin()
+    LinkedListIterator<T> begin() const
     {
         return LinkedListIterator<T>(_head);
     };
-    LinkedListIterator<T> end()
+    LinkedListIterator<T> end() const
     {
         return LinkedListIterator<T>(nullptr);
     }
 
+    ConstLinkedListIterator<T> cbegin() const
+    {
+        return ConstLinkedListIterator<T>(_head);
+    };
+    ConstLinkedListIterator<T> cend() const
+    {
+        return ConstLinkedListIterator<T>(nullptr);
+    }
+
 private:
     std::shared_ptr<LinkedListCell<T>> _head;
+    std::shared_ptr<LinkedListCell<T>> _tail;
     size_t _len;
 };
 
@@ -170,6 +220,12 @@ std::string to_string(LinkedList<T> &in)
     return s.str();
 }
 
+// Note that for all of these the need
+// to return a new list does an additional copying.
+//
+// One is probably better served in C++20 to use the
+// std::views | operations and just iterate rather than
+// create a new list, but sometimes you do want a new list
 template <class U, class T>
 LinkedList<U> list_map(LinkedList<T> &in,
                        std::function<U(T)> f)

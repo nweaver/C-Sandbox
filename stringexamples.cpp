@@ -1,6 +1,7 @@
 #include <string>
 
 #include "stringexamples.hpp"
+#include "confuzzle.h"
 
 #include <ctype.h>
 #include <algorithm>
@@ -42,6 +43,7 @@ std::string stripr(std::string s){
     }
     return s.substr(0, len);
 }
+
 
 */
 
