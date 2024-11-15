@@ -278,14 +278,14 @@ private:
             // Iterator for maps return an object where the .first field is the key and
             // the .second field is the value.  So for this it is the name and the
             // GraphNode object itself.
-            for (auto itr : working_graph->nodes)
+            for (auto [name, node] : working_graph->nodes)
             {
-                auto element = std::make_shared<DijkstraIterationStep<T>>(itr.second);
-                if (itr.first == start)
+                auto element = std::make_shared<DijkstraIterationStep<T>>(node);
+                if (name == start)
                 {
                     element->distance = 0;
                 }
-                working_set[itr.second] = element;
+                working_set[node] = element;
             }
             // Does a single step of the iterator so we are all queued up
             // at the first element.
@@ -314,15 +314,16 @@ private:
         // The iterator for a map automatically has first as the key
         // which is the node itself and
         // second as the value, which in this case is a DijkstraTraversal
-        for (auto itr : working_set)
+        for (auto [name, node] : working_set)
         {
+            (void) name;
             if (current_node == nullptr)
             {
-                current_node = itr.second;
+                current_node = node;
             }
-            if (itr.second->distance < current_node->distance)
+            if (node->distance < current_node->distance)
             {
-                current_node = itr.second;
+                current_node = node;
             }
         }
         working_set.erase(current_node->current);
