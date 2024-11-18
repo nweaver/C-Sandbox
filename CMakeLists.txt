@@ -26,7 +26,7 @@ enable_testing()
 
 add_executable(testbinary confuzzle.c confuzzle_test.cpp stringexamples.cpp stringexamples_test.cpp
  stringexamples_c.c stringexamples_c_test.cpp llist.cpp llist_test.cpp graph_test.cpp
- c_list.c c_list_test.cpp fileio_test.cpp tuple_map_test.cpp) 
+ c_list.c c_list_test.cpp fileio_test.cpp tuple_map_test.cpp workqueue_test.cpp ) 
 target_link_libraries(
   testbinary
   GTest::gtest_main
