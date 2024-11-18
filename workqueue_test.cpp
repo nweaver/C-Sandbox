@@ -15,6 +15,7 @@ TEST(WorkQueue, BasicTest)
     {
         WorkQueue<int> w;
 
+
         std::jthread j([&]()
                        {
                         std::cout << ".";

@@ -4,20 +4,40 @@
 #include <queue>
 #include <mutex>
 
-template <class T> class WorkQueue {
-    public:
-    WorkQueue(){};
+template <class T>
+class WorkQueue
+{
+private:
 
-    void put(T &element){
-        std::unique_lock l(lock);
-        auto wasempty = data.empty();
-        data.push(element);
-        if (wasempty) notify.notify_one();
+public:
+    WorkQueue()  {};
+    WorkQueue(const WorkQueue&) = delete;
+
+
+
+    void operator=(const WorkQueue&) = delete;
+
+    void put(T &element)
+    {
+        // Doing it this way means we release the lock
+        // before we notify, eliminating the accidental
+        // "wakup and wait on lock" problem that might
+        // otherwise occur.
+        bool wasempty = false;
+        {
+            std::unique_lock l(lock);
+            wasempty = data.empty();
+            data.push(element);
+        }
+        if (wasempty)
+            notify.notify_all();
     }
 
-    T get(){
+    T get()
+    {
         std::unique_lock l(lock);
-        while (data.empty()){
+        while (data.empty())
+        {
             notify.wait(l);
         }
         auto ret = data.front();
@@ -25,7 +45,7 @@ template <class T> class WorkQueue {
         return ret;
     }
 
-    private:
+private:
     std::queue<T> data;
     std::mutex lock;
     std::condition_variable notify;
