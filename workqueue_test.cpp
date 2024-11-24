@@ -36,4 +36,5 @@ TEST(WorkQueue, BasicTest)
         }
     }
     std::cout << "\n";
+    std::cout << RAND_MAX << "\n";
 }
