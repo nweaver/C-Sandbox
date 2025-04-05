@@ -77,6 +77,8 @@ TEST(C_LIST, BasicTestsAppend)
 TEST(C_LIST, SandboxPrint)
 {
     float f = 1.0;
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 
     printf("%i\n", *((int *)&f));
     printf("%i\n\n", (int)f);
