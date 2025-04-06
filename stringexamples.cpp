@@ -7,23 +7,31 @@
 #include <algorithm>
 #include <ranges>
 
-std::string toupper(std::string s){
-    for(auto &c: s){
+std::string toupper(std::string s)
+{
+    for (auto &c : s)
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
         c = toupper(c);
+#pragma GCC diagnostic pop
     }
     return s;
 }
 
-std::string reverse(std::string s){
+std::string reverse(std::string s)
+{
     reverse(s.begin(), s.end());
     return s;
 }
 
-
-std::string stripl(std::string s){
+std::string stripl(std::string s)
+{
     auto index = 0;
-    for (auto c : s){
-        if(!isspace(c)) {
+    for (auto c : s)
+    {
+        if (!isspace(c))
+        {
             break;
         }
         index++;
@@ -47,10 +55,13 @@ std::string stripr(std::string s){
 
 */
 
-std::string stripr(std::string s){
+std::string stripr(std::string s)
+{
     auto len = s.length();
-    for (auto c : s | std::views::reverse ){
-        if(!isspace(c)) {
+    for (auto c : s | std::views::reverse)
+    {
+        if (!isspace(c))
+        {
             break;
         }
         len--;
