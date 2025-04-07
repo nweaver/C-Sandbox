@@ -25,7 +25,7 @@ std::string reverse(std::string s)
     return s;
 }
 
-std::string stripl(std::string s)
+std::string stripl(const std::string &s)
 {
     auto index = 0;
     for (auto c : s)
@@ -55,7 +55,7 @@ std::string stripr(std::string s){
 
 */
 
-std::string stripr(std::string s)
+std::string stripr(const std::string &s)
 {
     auto len = s.length();
     for (auto c : s | std::views::reverse)
