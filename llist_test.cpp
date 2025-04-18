@@ -11,7 +11,7 @@ TEST(LinkedListTest, AppendingOnEnd)
     {
         EXPECT_EQ(foo.len(), i);
         EXPECT_EQ(bar.len(), i);
-        EXPECT_THROW(foo[i], LinkedListException);
+        EXPECT_THROW(foo[i], SliceException);
         foo.append(i);
         bar.prepend(i);
         EXPECT_EQ(foo[i], i);

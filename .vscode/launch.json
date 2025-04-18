@@ -30,7 +30,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/testbinary",
-            "args": ["fubar", "baz"],
+            "args": ["--gtest_filter=SliceTest*"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

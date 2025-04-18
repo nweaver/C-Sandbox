@@ -16,10 +16,10 @@ class LinkedListCell;
 template <class T>
 class LinkedList;
 
-class LinkedListException : public std::exception
+class SliceException : public std::exception
 {
 public:
-    LinkedListException(std::string in) { _msg = in; }
+    SliceException(std::string in) { _msg = in; }
     virtual const char *what() { return _msg.c_str(); }
 
 protected:
@@ -170,7 +170,7 @@ public:
         while (true)
         {
             if (at == nullptr)
-                throw LinkedListException("Index out of range");
+                throw SliceException("Index out of range");
             if (location == 0)
                 return at->_data;
             location--;
